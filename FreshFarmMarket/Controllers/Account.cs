@@ -36,7 +36,7 @@ namespace FreshFarmMarket.Controllers
                 {
                     TempData["FlashMessage.Type"] = "success";
                     TempData["FlashMessage.Text"] = string.Format("User {0} have been confirmed", user.UserName);
-                    return Redirect("/");
+				    return Redirect("/");
                 }
             TempData["FlashMessage.Type"] = "danger";
             TempData["FlashMessage.Text"] = string.Format("Invalid Email");

@@ -6,6 +6,9 @@ using FreshFarmMarket.Model;
 using FreshFarmMarket.ViewModels;
 using AspNetCore.ReCaptcha;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using SendGrid.Helpers.Mail;
+using Newtonsoft.Json.Linq;
+using FreshFarmMarket.Services;
 
 namespace FreshFarmMarket.Pages
 {
@@ -15,12 +18,14 @@ namespace FreshFarmMarket.Pages
 		private readonly SignInManager<ApplicationUser> signInManager;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly AuthDbContext _context;
-		public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<LoginModel> logger, AuthDbContext context)
+		private readonly EmailSender _emailsender;
+		public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<LoginModel> logger, AuthDbContext context, EmailSender emailSender)
 		{
 			this.signInManager = signInManager;
 			this.userManager = userManager;
 			_logger = logger;
 			_context = context;
+			_emailsender = emailSender;
 		}
 		private readonly ILogger<LoginModel> _logger;
 		[BindProperty]
@@ -35,9 +40,19 @@ namespace FreshFarmMarket.Pages
 			if (ModelState.IsValid)
 			{
 				var identityResult = await signInManager.PasswordSignInAsync(LModel.Email, LModel.Password, LModel.RememberMe, lockoutOnFailure: true);
+				if (identityResult.RequiresTwoFactor)
+				{
+					var user = await userManager.FindByEmailAsync(LModel.Email);
+					var Token = await userManager.GenerateTwoFactorTokenAsync(user, "Email");
+					var confirmation = Token;
+					await _emailsender.ExecuteOTP("One-Time Password", confirmation!, user.Email);
+					TempData["FlashMessage.Type"] = "success";
+					TempData["FlashMessage.Text"] = string.Format("Your OTP has been sent to your email");
+					return RedirectToPage("/LoginTwoStep", new { email = LModel.Email });
+				}
 				if (identityResult.Succeeded)
 				{
-                    HttpContext.Session.SetString("UserName", LModel.Email);
+					HttpContext.Session.SetString("UserName", LModel.Email);
 					var user = await userManager.FindByEmailAsync(LModel.Email);
 					var userId = await userManager.GetUserIdAsync(user);
 					if(userId != null)

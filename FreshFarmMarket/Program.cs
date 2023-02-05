@@ -4,13 +4,20 @@ using FreshFarmMarket.Model;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using FreshFarmMarket.Services;
 using AspNetCore.ReCaptcha;
+
 var builder = WebApplication.CreateBuilder(args);
+var provider = builder.Services.BuildServiceProvider();
+var configuration = provider.GetRequiredService<IConfiguration>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<AuthDbContext>();
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => { options.SignIn.RequireConfirmedAccount = true; options.Lockout.AllowedForNewUsers = true; options.Lockout.MaxFailedAccessAttempts = 3; options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30); })
-        .AddEntityFrameworkStores<AuthDbContext>().AddDefaultTokenProviders();
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
+    options.SignIn.RequireConfirmedAccount = true;
+    options.Lockout.AllowedForNewUsers = true; 
+    options.Lockout.MaxFailedAccessAttempts = 3; 
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+}).AddTokenProvider("MyApp", typeof(DataProtectorTokenProvider<ApplicationUser>)).AddEntityFrameworkStores<AuthDbContext>();
 builder.Services.ConfigureApplicationCookie(Config =>
 {
     Config.LoginPath = "/Login";
@@ -24,8 +31,8 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(1);
 });
 builder.Services.AddSendGrid(options =>
-    options.ApiKey = "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"
-                     ?? throw new Exception("The 'SendGridApiKey' is not configured")
+    options.ApiKey = configuration["SendGrid"]
+					 ?? throw new Exception("The 'SendGridApiKey' is not configured")
 );
 builder.Host.ConfigureLogging(logging =>
 {

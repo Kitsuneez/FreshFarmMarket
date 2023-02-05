@@ -33,6 +33,7 @@ namespace FreshFarmMarket.ViewModels
         public string Gender { get; set; }
         [Required]
         public string PhoneNumber { get; set; }
+        public bool TwoFactorEnabled { get; set; } = true;
         
 
 

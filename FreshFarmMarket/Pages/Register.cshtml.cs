@@ -65,6 +65,7 @@ namespace FreshFarmMarket.Pages
                     Address = @HtmlEncoder.Default.Encode(RModel.Address),
                     AboutMe= @HtmlEncoder.Default.Encode(RModel.AboutMe),
                     PhoneNumber = RModel.PhoneNumber,
+                    TwoFactorEnabled = true
                 };
                 if (Upload != null)
                 {
