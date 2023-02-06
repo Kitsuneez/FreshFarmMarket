@@ -15,32 +15,48 @@ namespace FreshFarmMarket.Pages
 
         private UserManager<ApplicationUser> userManager { get; }
         private SignInManager<ApplicationUser> signInManager { get; }
+        private RoleManager<IdentityRole> roleManager { get; }
         private EmailSender _emailsender;
+        private readonly AuthDbContext _authDbContext;
 
         private IWebHostEnvironment _environment;
         public RegisterModel(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IWebHostEnvironment environment,
-        EmailSender EmailSender)
+        EmailSender EmailSender,
+        AuthDbContext authDbContext,
+        RoleManager<IdentityRole> roleManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             _environment = environment;
             _emailsender = EmailSender;
+            _authDbContext = authDbContext;
+            this.roleManager = roleManager;
 
         }
 
         [BindProperty]
-        public Register RModel { get; set; }
+        public Register RModel { get; set; } = new Register();
         [BindProperty]
         public IFormFile? Upload { get; set; }
         public string[] Genders = new[] { "Male", "Female" }; 
-        public void OnGet()
+        public void OnGet(string? email, string? pfp)
         {
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                RModel.Email = email;
+
+            }
+            if (!string.IsNullOrWhiteSpace(pfp))
+            {
+                RModel.Photo = pfp;
+
+            }
         }
 
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string? pfp)
         {
 			if (ModelState.IsValid)
             {
@@ -48,7 +64,7 @@ namespace FreshFarmMarket.Pages
                 if(Checkuser != null)
                 {
                     TempData["FlashMessage.Type"] = "danger";
-                    TempData["FlashMessage.Text"] = string.Format("{0}",
+                    TempData["FlashMessage.Text"] = string.Format("{0} already exist",
                     Checkuser);
                     return Page();
                 }
@@ -82,9 +98,10 @@ namespace FreshFarmMarket.Pages
                     user.Photo = string.Format("/{0}/{1}", uploadsFolder, imageFile);
                     }
                 if(Upload == null) {
-                    System.Diagnostics.Debug.WriteLine("mt");
+                    user.Photo = pfp;
                 }
                 var result = await userManager.CreateAsync(user, RModel.Password);
+                await userManager.AddToRoleAsync(user, "User");
                 if (result.Succeeded)
                 {
                     var token = await userManager.GenerateEmailConfirmationTokenAsync(user);

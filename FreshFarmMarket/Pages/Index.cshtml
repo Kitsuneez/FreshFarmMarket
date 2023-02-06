@@ -9,6 +9,7 @@
     var user = await UserManager.GetUserAsync(User);
     var dataProtectionProvider = DataProtectionProvider.Create("EncryptData");
     var protector = dataProtectionProvider.CreateProtector("MySecretKey");
+    var creditcard = "";
 }
 
 <div class="container">
@@ -43,7 +44,16 @@
                                 <h6 class="mb-0">Credit Card Number</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                @protector.Unprotect(user.CreditCard)
+                                @if(user.CreditCard == null)
+                                {
+                                    creditcard = "No Data";
+                                }
+                                else
+                                {
+                                    creditcard = protector.Unprotect(user.CreditCard);
+                                    
+                                }
+                                @creditcard
                             </div>
                         </div>
                         <div class="row">

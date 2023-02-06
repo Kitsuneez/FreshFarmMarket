@@ -34,7 +34,7 @@ namespace FreshFarmMarket.Pages
 			await signInManager.SignOutAsync();
 			return RedirectToPage("Login");
 		}
-		public async Task<IActionResult> OnPostDontLogoutAsync()
+		public IActionResult OnPostDontLogoutAsync()
 		{
 			return RedirectToPage("Index");
 		}

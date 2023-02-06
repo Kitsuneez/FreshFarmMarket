@@ -22,6 +22,8 @@ namespace FreshFarmMarket.Pages
 		private readonly ILogger<LoginModel> _logger;
 		[BindProperty]
 		public string OTP { get; set; }
+		public AuditLog AModel { get; set; } = new AuditLog();
+
 		public async void OnGet()
         {
 
@@ -33,8 +35,19 @@ namespace FreshFarmMarket.Pages
 			Console.WriteLine(test.Succeeded);
 			if (test.Succeeded)
 			{
-				HttpContext.Session.SetString("UserName", Emailuser.Email);
 				await signInManager.SignInAsync(Emailuser, false);
+				await userManager.ResetAccessFailedCountAsync(Emailuser);
+				if (DateTime.Now > Emailuser.PasswordAge.Value.AddMinutes(30))
+				{
+					return RedirectToPage("/ChangePassword", new { email = email });
+				}
+
+				AModel.userId = Emailuser.Id;
+				AModel.action = "Logged In";
+				AModel.timeStamp = DateTime.Now;
+				_context.AuditLogs.Add(AModel);
+				_context.SaveChanges();
+				HttpContext.Session.SetString("UserName", Emailuser.Email);
 				return RedirectToPage("/Index");
 			}
 			return Page();

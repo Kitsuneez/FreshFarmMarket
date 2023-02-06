@@ -16,5 +16,6 @@ namespace FreshFarmMarket.Model
             string connectionString = _configuration.GetConnectionString("AuthConnectionString"); optionsBuilder.UseSqlServer(connectionString);
         }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<UserHistory> UserHistory { get; set; }
     }
 }

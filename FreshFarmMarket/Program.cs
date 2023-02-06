@@ -4,6 +4,7 @@ using FreshFarmMarket.Model;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using FreshFarmMarket.Services;
 using AspNetCore.ReCaptcha;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 var provider = builder.Services.BuildServiceProvider();
@@ -13,16 +14,33 @@ var configuration = provider.GetRequiredService<IConfiguration>();
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<AuthDbContext>();
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
+    options.Password.RequiredLength = 12;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase= true;
     options.SignIn.RequireConfirmedAccount = true;
     options.Lockout.AllowedForNewUsers = true; 
     options.Lockout.MaxFailedAccessAttempts = 3; 
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-}).AddTokenProvider("MyApp", typeof(DataProtectorTokenProvider<ApplicationUser>)).AddEntityFrameworkStores<AuthDbContext>();
+}).AddRoles<IdentityRole>().AddTokenProvider("MyApp", typeof(DataProtectorTokenProvider<ApplicationUser>)).AddEntityFrameworkStores<AuthDbContext>();
 builder.Services.ConfigureApplicationCookie(Config =>
 {
     Config.LoginPath = "/Login";
     Config.LogoutPath = "/Logout";
     Config.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    Config.AccessDeniedPath = "/Errors/401";
+});
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromMinutes(5);
+});
+builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+{
+	googleOptions.ClientId = configuration["Google:ClientId"] ?? throw new Exception("The 'ClientId' is not configured");
+    googleOptions.ClientSecret = configuration["Google:ClientSecret"] ?? throw new Exception("The 'ClientSecret' is not configured");
+	googleOptions.ClaimActions.MapJsonKey("image", "picture", "url");
+	googleOptions.SaveTokens = true;
 });
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDistributedMemoryCache();

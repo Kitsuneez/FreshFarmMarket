@@ -12,8 +12,13 @@
 		<div class="col-sm-12 col-md-12 col-lg-4">
 			<h1 class="mb-3">Login </h1>
 
-			<form method="post">
-
+			<form method="post" enctype="multipart/form-data">
+				<div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
+						<p class="lead fw-normal mb-0 me-3">Sign in with</p>
+						<a asp-area="" asp-controller="Account" asp-action="GoogleLogin" class="btn btn-primary btn-floating mx-1">
+							<i class="bi bi-google"></i>
+						</a>
+				</div>
 				<div class="mb-3">
 					<label class="form-label" asp-for="LModel.Email">Email Address</label>
 					<input type="Text" asp-for="LModel.Email" class="form-control" />
@@ -36,6 +41,7 @@
 					<button type="submit" class="btn btn-primary">Login</button>
 				</div>
 			</form>
+			<a asp-page="/ForgetpasswordEmail">Forget Password</a>
 		</div>
 	</div>
 </div>

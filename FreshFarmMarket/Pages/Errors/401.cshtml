@@ -1,7 +1,7 @@
 ﻿@page
-@model FreshFarmMarket.Pages.Errors.Pages_Errors_403
+@model FreshFarmMarket.Pages.Errors.Pages_Errors_401
 @{
-	ViewData["Title"] = "Forbidden";
+	ViewData["Title"] = "Unauthorized";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +12,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-	<title>403 HTML Template by Colorlib</title>
+	<title>401 HTML Template by Colorlib</title>
 
 	<!-- Google font -->
 	<link href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700" rel="stylesheet">
@@ -31,12 +31,12 @@
 
 <body>
 
-	<div id="forbidden">
-		<div class="forbidden">
-			<div class="forbidden-403">
-				<h1>4<span>0</span>3</h1>
+	<div id="unauthorized">
+		<div class="unauthorized">
+			<div class="unauthorized-401">
+				<h1>4<span>0</span>1</h1>
 			</div>
-			<p>You don't have permission to access this resource.</p>
+			<p>Unauthorized: You have attempted to access a page for which you are not authorized</p>
 			<a asp-page="/index">home page</a>
 		</div>
 	</div>
@@ -55,13 +55,13 @@ body {
   margin: 0;
 }
 
-#forbidden {
+#unauthorized {
   position: relative;
   height: 100vh;
   background-color: #222;
 }
 
-#forbidden .forbidden {
+#unauthorized .unauthorized {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -70,19 +70,19 @@ body {
           transform: translate(-50%, -50%);
 }
 
-.forbidden {
+.unauthorized {
   max-width: 460px;
   width: 100%;
   text-align: center;
   line-height: 1.4;
 }
 
-.forbidden .forbidden-403 {
+.unauthorized .unauthorized-401 {
   height: 158px;
   line-height: 153px;
 }
 
-.forbidden .forbidden-403 h1 {
+.unauthorized .unauthorized-401 h1 {
   font-family: 'Josefin Sans', sans-serif;
   color: #222;
   font-size: 220px;
@@ -92,11 +92,11 @@ body {
   text-shadow: 2px 2px 0px #c9c9c9, -2px -2px 0px #c9c9c9;
 }
 
-.forbidden .forbidden-403 h1>span {
+.unauthorized .unauthorized-401 h1>span {
   text-shadow: 2px 2px 0px #ffab00, -2px -2px 0px #ffab00, 0px 0px 8px #ff8700;
 }
 
-.forbidden p {
+.unauthorized p {
   font-family: 'Josefin Sans', sans-serif;
   color: #c9c9c9;
   font-size: 16px;
@@ -105,7 +105,7 @@ body {
   margin-bottom: 15px;
 }
 
-.forbidden a {
+.unauthorized a {
   font-family: 'Josefin Sans', sans-serif;
   font-size: 14px;
   text-decoration: none;
@@ -120,7 +120,7 @@ body {
   transition: 0.2s all;
 }
 
-.forbidden a:hover {
+.unauthorized a:hover {
   color: #ffab00;
   border-color: #ffab00;
 }

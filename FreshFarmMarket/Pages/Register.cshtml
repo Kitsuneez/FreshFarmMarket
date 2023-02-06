@@ -15,7 +15,13 @@
 
 				<div class="mb-3">
 					<label class="form-label" asp-for="RModel.Email">Email Address</label>
-					<input type="email" asp-for="RModel.Email" class="form-control" />
+					@if(!string.IsNullOrEmpty(Model.RModel.Email)){
+						<input type="email" asp-for="RModel.Email" class="form-control" value="@Model.RModel.Email" readonly/>
+					}
+					else
+					{
+						<input type="email" asp-for="RModel.Email" class="form-control"/>
+					}
 					<span asp-validaton-for="RModel.Email" class="text-danger"></span>
 				</div>
 				<div class="mb-3">
@@ -30,7 +36,7 @@
 				</div>
 				<div class="mb-3">
 					<label class="form-label" asp-for="RModel.PhoneNumber">Phone Number</label>
-					<input type="text" asp-for="RModel.PhoneNumber" class="form-control" pattern="[0-9\s]{8}" />
+					<input type="number" asp-for="RModel.PhoneNumber" class="form-control" pattern="[0-9\s]{8}" />
 					<span asp-validaton-for="RModel.PhoneNumber" class="text-danger"></span>
 				</div>
 				<div class="mb-3">
@@ -80,10 +86,13 @@
 				</div>
 				<div class="mb-3">
 					<label class="form-label" asp-for="Upload">Image</label>
-					<input type="file" accept=".jpg" asp-for="Upload" class="form-control" onchange="showImgPreview(this)"/>
-					<span asp-validaton-for="Upload" class="text-danger"></span>
+					@if (string.IsNullOrEmpty(Model.RModel.Photo))
+					{
+						<input type="file" accept=".jpg" asp-for="Upload" class="form-control" onchange="showImgPreview(this)"/>
+						<span asp-validaton-for="Upload" class="text-danger"></span>					
+					}
 				</div>
-				<img id="imgPreview" style="height:200px;width:200px;object-fit:cover; border: 3px solid #CED4DA;" src="/uploads/user.png" />
+				<img id="imgPreview" style="height:200px;width:200px;object-fit:cover; border: 3px solid #CED4DA;" src="@Model.RModel.Photo" />
 				<div class="mb-3">
 					<button type="submit" class="btn btn-primary">Register</button>
 				</div>

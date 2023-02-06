@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration.UserSecrets;
 using SendGrid.Helpers.Mail;
 using Newtonsoft.Json.Linq;
 using FreshFarmMarket.Services;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace FreshFarmMarket.Pages
 {
@@ -19,21 +20,32 @@ namespace FreshFarmMarket.Pages
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly AuthDbContext _context;
 		private readonly EmailSender _emailsender;
-		public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<LoginModel> logger, AuthDbContext context, EmailSender emailSender)
+		private  RoleManager<IdentityRole> roleManager;
+		public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<LoginModel> logger, AuthDbContext context, EmailSender emailSender, RoleManager<IdentityRole> roleManager)
 		{
 			this.signInManager = signInManager;
 			this.userManager = userManager;
 			_logger = logger;
 			_context = context;
 			_emailsender = emailSender;
+			this.roleManager = roleManager;
 		}
 		private readonly ILogger<LoginModel> _logger;
 		[BindProperty]
 		public Login LModel { get; set; }
 		public AuditLog AModel { get; set; } = new AuditLog();
 
-		public void OnGet()
+		public async Task OnGet()
 		{
+			string[] roleNames = { "Administrator", "GroupUser", "User", "Guest" };
+			foreach (var roleName in roleNames)
+			{
+				var roleExist = await roleManager.RoleExistsAsync(roleName);
+				if (!roleExist)
+				{
+					await roleManager.CreateAsync(new IdentityRole(roleName));
+				}
+			}
 		}
 		public async Task<IActionResult> OnPostAsync()
 		{
@@ -52,9 +64,10 @@ namespace FreshFarmMarket.Pages
 				}
 				if (identityResult.Succeeded)
 				{
-					HttpContext.Session.SetString("UserName", LModel.Email);
 					var user = await userManager.FindByEmailAsync(LModel.Email);
+					HttpContext.Session.SetString("UserName", LModel.Email);
 					var userId = await userManager.GetUserIdAsync(user);
+					await userManager.ResetAccessFailedCountAsync(user);
 					if(userId != null)
 					{
 						AModel.userId = userId;
@@ -68,7 +81,7 @@ namespace FreshFarmMarket.Pages
                 if (identityResult.IsLockedOut)
                 {
                     ModelState.AddModelError("", "The account is locked out");
-					TempData["FlashMessage.Text"] = "Account is locked out";
+					TempData["FlashMessage.Text"] = "Account is locked out, You can reset your password in Forget Password";
 					TempData["FlashMessage.Type"] = "error";
 					return Page();
                 }
