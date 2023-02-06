@@ -85,7 +85,7 @@ namespace FreshFarmMarket.Controllers
 			var properties = signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
 			return Challenge(properties, "Google");
 		}
-		public async Task<IActionResult> GoogleCallback(string returnUrl = null, string remoteError = null)
+		public async Task<IActionResult> GoogleCallback(string? returnUrl = null, string? remoteError = null)
 		{
 			if (remoteError != null)
 			{
